@@ -4,10 +4,12 @@ const express = require("express");
 const config = require("config");
 
 class AppServer {
+  #app;
   constructor() {
-    this.app = express();
+    this.#app = express();
     this.port = config.get("app.port");
     this.env = config.get("app.env");
+    this.#setupApp();
     // this.#connectToDatabase();
     // this.#initializeMiddlewares();
     // this.#initializeRoutes();
@@ -17,7 +19,9 @@ class AppServer {
     // this.#initCronJobs();
     // this.serveReactAppForUnknowPaths();
   }
-
+  #setupApp() {
+    this.#setupEjs();
+  }
   async #connectToDatabase() {
     try {
       await sequelize.authenticate();
@@ -29,6 +33,9 @@ class AppServer {
       error.message && logger.error(`${error.message}`);
       process.exit(1);
     }
+  }
+  #setupEjs() {
+    this.#app.set("view engine", "ejs");
   }
 
   #createHttpServer() {
@@ -64,7 +71,7 @@ class AppServer {
   }
 
   listen() {
-    this.app.listen(this.port, () => {
+    this.#app.listen(this.port, () => {
       console.log(`========= ENV: ${this.env} ==========`);
       console.log(`🚀 Server listening on the port ${this.port}`);
     });
