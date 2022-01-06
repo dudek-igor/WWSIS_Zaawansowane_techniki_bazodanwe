@@ -3,6 +3,7 @@
 const http = require("http");
 const express = require("express");
 const config = require("config");
+const { pool } = require("./database");
 const AppRoutes = require("./routes");
 
 class AppServer {
@@ -15,25 +16,20 @@ class AppServer {
     this.#setupApp();
   }
   #setupApp() {
-    this.#setupEjs();
+    this.#setupViews();
+    this.#setupMiddlewares();
     this.#mountRoutes();
     this.#createHttpServer();
   }
-  //   async #connectToDatabase() {
-  //     try {
-  //       await sequelize.authenticate();
-  //       logger.info(`============= Database =============`);
-  //       logger.info("😎 Database connection has been established successfully.");
-  //     } catch (error) {
-  //       logger.error(`============= Database =============`);
-  //       logger.error("☠️ Unable to connect to the database.");
-  //       error.message && logger.error(`${error.message}`);
-  //       process.exit(1);
-  //     }
-  //   }
-  #setupEjs() {
+  #setupViews() {
     this.#app.set("view engine", "ejs");
     this.#app.use(express.static("public"));
+  }
+  #setupMiddlewares() {
+    this.#app.disable("x-powered-by");
+    this.#app.set("pool", pool);
+    this.#app.use(express.json());
+    // this.#app.use(express.urlencoded({ extended: true }));
   }
 
   #mountRoutes() {
@@ -42,23 +38,6 @@ class AppServer {
 
   #createHttpServer() {
     this.#server = http.createServer(this.#app);
-  }
-
-  #initializeMiddlewares() {
-    // this.app.disable("x-powered-by");
-    // this.app.use(morgan(config.get("log.format"), { stream }));
-    // this.app.use(
-    //   cors({
-    //     origin: config.get("cors.origin"),
-    //     credentials: config.get("cors.credentials"),
-    //   })
-    // );
-    // this.app.use(hpp());
-    // this.app.use(helmet());
-    // this.app.use(compression());
-    // this.app.use(express.json());
-    // this.app.use(express.urlencoded({ extended: true }));
-    // this.app.use(cookieParser());
   }
 
   #initializeErrorHandling() {

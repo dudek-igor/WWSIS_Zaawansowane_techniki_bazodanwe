@@ -13,10 +13,56 @@
 
     <main class="p-5 my-4 bg-light rounded-3">
       <div class="container-fluid py-5">
-        <h3>Dodaj Typ</h3>
+        <form id="addPrjectTypeForm">
+          <div class="mb-3">
+            <label for="addPrjectType" class="form-label"
+              >Dodaj Rodzaj Projektu</label
+            >
+            <input type="text" class="form-control" id="addPrjectType" />
+          </div>
+          <button type="submit" id="submitButton" class="btn btn-primary">
+            Zatwierdź
+          </button>
+        </form>
       </div>
     </main>
 
     <footer><%- include('../partials/footer'); %></footer>
+    <script>
+      document
+        .getElementById("addPrjectTypeForm")
+        .addEventListener("submit", saveProjectType);
+
+      function saveProjectType(e) {
+        e.preventDefault();
+        const inputValue = document.getElementById("addPrjectType");
+        const submitButton = document.getElementById("submitButton");
+        if (!!inputValue.value) {
+          fetch("/api/v1/add/type", {
+            method: "POST", // *GET, POST, PUT, DELETE, etc.
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              type: inputValue.value.trim().toLowerCase(),
+            }), // body data type must match "Content-Type" header
+          })
+            .then((res) => res.json())
+            .then(({ error }) => {
+              if (error) throw new Error();
+              submitButton.classList.add("btn-success");
+              submitButton.classList.remove("btn-primary");
+              submitButton.classList.remove("btn-danger");
+              inputValue.value = "";
+            })
+            .catch((err) => {
+              console.log(err);
+              submitButton.classList.add("btn-danger");
+              submitButton.classList.remove("btn-primary");
+              submitButton.classList.remove("btn-success");
+            });
+        }
+      }
+    </script>
   </body>
 </html>
