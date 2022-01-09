@@ -13,10 +13,115 @@
 
     <main class="p-5 my-4 bg-light rounded-3">
       <div class="container-fluid py-5">
-        <h3>Edytuj Typ</h3>
+        <h3>Edytuj Typ Projektu</h3>
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col"></th>
+              <th scope="col">Aktualna Nazwa</th>
+              <th scope="col">Nowa nazwa</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% types.forEach(function(type) { %>
+            <tr class="d-none" id="row_delete_<%= type.id_rodzaj %>">
+              <th scope="row" colspan="3">Usunięto</th>
+            </tr>
+            <tr id="row_<%= type.id_rodzaj %>">
+              <th scope="row">
+                <button
+                  class="btn btn-primary mx-2"
+                  onclick="editAndSave('<%= type.id_rodzaj %>')"
+                >
+                  Aktulizuj</button
+                ><button
+                  class="btn btn-danger mx-2"
+                  onclick="deleteRow('<%= type.id_rodzaj %>')"
+                >
+                  Usuń
+                </button>
+              </th>
+              <td id="actual_<%= type.id_rodzaj %>">
+                <%= type.nazwa_rodzaj %>
+              </td>
+              <td>
+                <input
+                  type="text"
+                  id="input_<%= type.id_rodzaj %>"
+                  placeholder="Wprowadź nową nazwę"
+                  class="form-control"
+                  aria-describedby="value"
+                />
+                <span id="span_<%= type.id_rodzaj %>"></span>
+              </td>
+            </tr>
+            <% }); %>
+          </tbody>
+        </table>
       </div>
     </main>
-
     <footer><%- include('../partials/footer'); %></footer>
+    <script>
+      function editAndSave(id) {
+        const input = document.getElementById(`input_${id}`);
+        const span = document.getElementById(`span_${id}`);
+        const actualValue = document.getElementById(`actual_${id}`);
+        if (!!input.value) {
+          fetch("/api/v1/edit/type", {
+            method: "PUT", // *GET, POST, PUT, DELETE, etc.
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              type: input.value.trim().toLowerCase(),
+              id: id,
+            }), // body data type must match "Content-Type" header
+          })
+            .then((res) => {
+              return res.json();
+            })
+            .then(({ error }) => {
+              if (error) throw new Error();
+              span.innerHTML = "Zaktulizowano";
+              span.classList.remove("text-danger");
+              span.classList.add("text-success");
+              actualValue.innerHTML = input.value;
+              input.value = "";
+            })
+            .catch((err) => {
+              span.innerHTML = "Coś poszło nie tak. Spróbuj jeszcze raz";
+              span.classList.remove("text-success");
+              span.classList.add("text-danger");
+            });
+        } else {
+          span.innerHTML = "Wartość pola nie może być pusta";
+          span.classList.add("text-danger");
+        }
+      }
+      function deleteRow(id) {
+        const row = document.getElementById(`row_${id}`);
+        const row_delete = document.getElementById(`row_delete_${id}`);
+        row.classList.add("d-none");
+        row_delete.classList.remove("d-none");
+        fetch("/api/v1/delete/type", {
+          method: "DELETE", // *GET, POST, PUT, DELETE, etc.
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id: id,
+          }), // body data type must match "Content-Type" header
+        })
+          .then((res) => {
+            return res.json();
+          })
+          .then(({ error }) => {
+            if (error) throw new Error();
+            row.classList.add("d-none");
+            row_delete.classList.remove("d-none");
+          })
+          .catch((err) => {});
+      }
+    </script>
   </body>
 </html>

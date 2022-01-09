@@ -12,11 +12,201 @@
     <header><%- include('../partials/nav'); %></header>
 
     <main class="p-5 my-4 bg-light rounded-3">
-      <div class="container-fluid py-5">
+      <div class="container-fluid py-1">
         <h3>Dodaj Projekt</h3>
+      </div>
+      <div class="container-fluid py-2">
+        <form id="addPrjectForm">
+          <div class="mb-3">
+            <label for="inputType" class="form-label"
+              >Wybierz Rodzaj Projektu</label
+            >
+            <select id="inputType" class="form-control">
+              <option class="font-italic" selected>Wybierz Rodzaj...</option>
+              <% types.forEach(function(x) { %>
+              <option><%= x.nazwa_rodzaj %></option>
+              <% }); %>
+            </select>
+            <span class="text-danger d-none" id="inputTypeControl"
+              >Proszę Wybrać wartość</span
+            >
+          </div>
+          <div class="mb-3">
+            <label for="inputState" class="form-label"
+              >Wybierz Status Projektu</label
+            >
+            <select id="inputState" class="form-control">
+              <option class="font-italic" selected>Wybierz Status...</option>
+              <% status.forEach(function(x) { %>
+              <option><%= x.nazwa_status %></option>
+              <% }); %>
+            </select>
+            <span id="inputStateControl" class="text-danger d-none"
+              >Proszę Wybrać Wartość</span
+            >
+          </div>
+          <div class="mb-3">
+            <label for="inputProjectNumber" class="form-label"
+              >Numer Projektu</label
+            >
+            <input type="number" class="form-control" id="inputProjectNumber" />
+            <span id="inputProjectNumberControl" class="text-danger d-none"
+              >Proszę Wprowadzić Wartość</span
+            >
+          </div>
+          <div class="mb-3">
+            <label for="inputSubject" class="form-label">Temat Projektu</label>
+            <input type="text" class="form-control" id="inputSubject" />
+            <span id="inputSubjectControl" class="text-danger d-none"
+              >Proszę Wprowadzić Wartość</span
+            >
+          </div>
+          <div class="mb-3">
+            <label for="inputStartProject" class="form-label"
+              >Data Rozpoczęcia Projektu</label
+            >
+            <input type="date" class="form-control" id="inputStartProject" />
+            <span id="inputStartProjectControl" class="text-danger d-none"
+              >Proszę Wprowadzić Wartość</span
+            >
+          </div>
+          <div class="mb-3">
+            <label for="inputEndProject" class="form-label"
+              >Data Zakończenia Projektu</label
+            >
+            <input type="date" class="form-control" id="inputEndProject" />
+            <span id="inputEndProjectControl"></span>
+          </div>
+          <div class="mb-3">
+            <label for="inputAmountOfProject" class="form-label"
+              >Kwota Projektu</label
+            >
+            <input
+              type="number"
+              class="form-control"
+              id="inputAmountOfProject"
+            />
+            <span id="inputAmountOfProjectControl" class="text-danger d-none"
+              >Proszę Wprowadzić Wartość</span
+            >
+          </div>
+          <div class="mb-3">
+            <label for="inputTips" class="form-label">Uwagi</label>
+            <textarea rows="3" class="form-control" id="inputTips"></textarea>
+            <span id="inputTipsControl"></span>
+          </div>
+          <button type="submit" id="submitButton" class="btn btn-primary">
+            Zatwierdź
+          </button>
+          <span id="handlePromise"></span>
+        </form>
       </div>
     </main>
 
     <footer><%- include('../partials/footer'); %></footer>
+
+    <script>
+      document
+        .getElementById("addPrjectForm")
+        .addEventListener("submit", saveProject);
+
+      function saveProject(e) {
+        e.preventDefault();
+        const span = document.getElementById("handlePromise");
+        const submitButton = document.getElementById("submitButton");
+        // input values
+        const type = document.getElementById("inputType");
+        const typeControl = document.getElementById("inputTypeControl");
+        const state = document.getElementById("inputState");
+        const stateControl = document.getElementById("inputStateControl");
+        const projectNumber = document.getElementById("inputProjectNumber");
+        const projectNumberControl = document.getElementById(
+          "inputProjectNumberControl"
+        );
+        const inputSubject = document.getElementById("inputSubject");
+        const inputSubjectControl = document.getElementById(
+          "inputSubjectControl"
+        );
+        const inputStartProject = document.getElementById("inputStartProject");
+        const inputStartProjectControl = document.getElementById(
+          "inputStartProjectControl"
+        );
+        const inputEndProject = document.getElementById("inputEndProject");
+        const inputEndProjectControl = document.getElementById(
+          "inputEndProjectControl"
+        );
+        const inputAmountOfProject = document.getElementById(
+          "inputAmountOfProject"
+        );
+        const inputAmountOfProjectControl = document.getElementById(
+          "inputAmountOfProjectControl"
+        );
+        const inputTips = document.getElementById("inputTips");
+        const inputTipsControl = document.getElementById("inputTipsControl");
+        let formIsValid = true;
+        // Validate inputs
+        if (!type.value || type.value === "Wybierz Rodzaj...") {
+          typeControl.classList.remove("d-none");
+          formIsValid = false;
+        }
+        if (!state.value || state.value === "Wybierz Status...") {
+          stateControl.classList.remove("d-none");
+          formIsValid = false;
+        }
+        if (!projectNumber.value) {
+          projectNumberControl.classList.remove("d-none");
+          formIsValid = false;
+        }
+        if (!inputSubject.value) {
+          inputSubjectControl.classList.remove("d-none");
+          formIsValid = false;
+        }
+        if (!inputStartProject.value) {
+          inputStartProjectControl.classList.remove("d-none");
+          formIsValid = false;
+        }
+        if (!inputAmountOfProject.value) {
+          inputAmountOfProjectControl.classList.remove("d-none");
+          formIsValid = false;
+        }
+        // Save project
+        if (formIsValid) {
+          fetch("/api/v1/add/project", {
+            method: "POST", // *GET, POST, PUT, DELETE, etc.
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              type: type.value.trim().toLowerCase(),
+              state: state.value.trim().toLowerCase(),
+              projectNumber: projectNumber.value.trim().toLowerCase(),
+              subject: inputSubject.value.trim().toLowerCase(),
+              start: inputStartProject.value,
+              end: inputEndProject.value,
+              amount: inputAmountOfProject.value,
+              tips: inputTips.value,
+            }), // body data type must match "Content-Type" header
+          })
+            .then((res) => res.json())
+            .then(({ error }) => {
+              if (error) throw new Error();
+              span.innerHTML = "Dodano";
+              span.classList.remove("text-danger");
+              span.classList.add("text-success");
+              submitButton.classList.add("btn-success");
+              submitButton.classList.remove("btn-primary");
+              submitButton.classList.remove("btn-danger");
+            })
+            .catch((err) => {
+              span.innerHTML = "Coś poszło nie tak :(";
+              span.classList.remove("text-success");
+              span.classList.add("text-danger");
+              submitButton.classList.add("btn-danger");
+              submitButton.classList.remove("btn-primary");
+              submitButton.classList.remove("btn-success");
+            });
+        }
+      }
+    </script>
   </body>
 </html>

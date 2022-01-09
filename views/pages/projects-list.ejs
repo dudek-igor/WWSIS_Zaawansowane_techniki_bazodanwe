@@ -14,6 +14,40 @@
     <main class="p-5 my-4 bg-light rounded-3">
       <div class="container-fluid py-5">
         <h3>Lista Aktulanych Projektów</h3>
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Rodzaj Projektu</th>
+              <th scope="col">Status Projektu</th>
+              <th scope="col">Nr Projektu</th>
+              <th scope="col">Temat Projektu</th>
+              <th scope="col">Data Rozpoczęcia</th>
+              <th scope="col">Data Zakończenia</th>
+              <th scope="col">Kwota Projektu</th>
+              <th scope="col">Uwagi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% projects.forEach(function(x) { %>
+            <tr>
+              <td><%= x.nazwa_rodzaj %></td>
+              <td><%= x.nazwa_status %></td>
+              <td><%= x.nr_projekt %></td>
+              <td><%= x.temat_projekt %></td>
+              <td>
+                <%= x.data_rozpoczecia && new
+                Date(x.data_rozpoczecia).toLocaleDateString('en-GB') %>
+              </td>
+              <td>
+                <%= x.data_zakoczenia && new
+                Date(x.data_zakoczenia).toLocaleDateString('en-GB') %>
+              </td>
+              <td><%= x.kwota %></td>
+              <td><%= x.uwagi %></td>
+            </tr>
+            <% }); %>
+          </tbody>
+        </table>
       </div>
     </main>
 

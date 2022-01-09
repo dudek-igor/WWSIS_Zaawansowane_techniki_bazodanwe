@@ -23,6 +23,7 @@
           <button type="submit" id="submitButton" class="btn btn-primary">
             Zatwierdź
           </button>
+          <span id="handlePromise"></span>
         </form>
       </div>
     </main>
@@ -37,6 +38,7 @@
         e.preventDefault();
         const inputValue = document.getElementById("addPrjectType");
         const submitButton = document.getElementById("submitButton");
+        const span = document.getElementById("handlePromise");
         if (!!inputValue.value) {
           fetch("/api/v1/add/type", {
             method: "POST", // *GET, POST, PUT, DELETE, etc.
@@ -50,6 +52,9 @@
             .then((res) => res.json())
             .then(({ error }) => {
               if (error) throw new Error();
+              span.innerHTML = "Dodano";
+              span.classList.remove("text-danger");
+              span.classList.add("text-success");
               submitButton.classList.add("btn-success");
               submitButton.classList.remove("btn-primary");
               submitButton.classList.remove("btn-danger");
@@ -57,10 +62,27 @@
             })
             .catch((err) => {
               console.log(err);
+              span.innerHTML = "Taki rodzaj projektu już istnieje";
+              span.classList.remove("text-success");
+              span.classList.add("text-danger");
               submitButton.classList.add("btn-danger");
               submitButton.classList.remove("btn-primary");
               submitButton.classList.remove("btn-success");
             });
+        } else {
+          span.innerHTML = "Wartość pola nie może być pusta";
+          span.classList.remove("text-success");
+          span.classList.add("text-danger");
+          submitButton.classList.add("btn-danger");
+          submitButton.classList.remove("btn-primary");
+          submitButton.classList.remove("btn-success");
+          setTimeout(() => {
+            span.innerHTML = "";
+            span.classList.remove("text-danger");
+            submitButton.classList.add("btn-primary");
+            submitButton.classList.remove("btn-danger");
+            submitButton.classList.remove("btn-success");
+          }, 3000);
         }
       }
     </script>
